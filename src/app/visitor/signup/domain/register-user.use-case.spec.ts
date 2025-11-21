@@ -1,45 +1,28 @@
-import { inject, Injectable } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
-import { User, Visitor } from '@app/core/entity/user.interface';
+import { TestBed } from '@angular/core/testing';
+
+import { RegisterUserUseCase } from './register-user.use-case';
 import { AuthenticationService } from '@app/core/port/authentication.service';
 import { UserService } from '@app/core/port/user.service';
 import { UserStore } from '@app/core/store/user.store';
-import { EmailAlreadyTakenError } from './email-already-taken.error';
 import { Router } from '@angular/router';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class RegisterUserUseCase {
-  readonly #authenticationService = inject(AuthenticationService);
-  readonly #userService = inject(UserService);
-  readonly #userStore = inject(UserStore);
-  readonly #router = inject(Router);
+describe('RegisterUserUseCaseService', () => {
+  let service: RegisterUserUseCase;
 
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        RegisterUserUseCase,
+        { provide: AuthenticationService, useValue: { register: jest.fn() }},
+        { provide: UserService, useValue: { create: jest.fn( ) }},
+        { provide: UserStore, useValue: { register: jest.fn() }},
+        { provide: Router, useValue: { navigate: jest.fn() }},
+      ],
+    });
+    service = TestBed.inject(RegisterUserUseCase);
+  });
 
-  async execute(visitor: Visitor): Promise<void> {
-    // 1. Authenticate new visitor
-    const { name, email, password } = visitor;
-    const registerResponse = await firstValueFrom(this.#authenticationService.register(email, password));
-
-    if(registerResponse instanceof EmailAlreadyTakenError) {
-      throw registerResponse;
-    }
-
-    // 2. Add credentials information in session storage
-    const { userId: id, jwtToken } = registerResponse;
-
-    localStorage.setItem('jwtToken', jwtToken);
-
-    // 3. Create new user in database
-    const user: User = { id, name, email };
-    await firstValueFrom(this.#userService.create(user, jwtToken));
-
-    // 4. Add user in app store
-    this.#userStore.register(user);
-
-    // 5. Redirect user to dashboard
-    this.#router.navigate(['/app/dashboard']);
-
-  }
-}
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
+});
