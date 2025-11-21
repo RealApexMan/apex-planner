@@ -1,12 +1,15 @@
 import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { App } from './app';
+import { provideRouter, RouterOutlet } from '@angular/router';
+import { NavbarSmartComponent } from './core/component/navbar/navbar.smart.component';
+
 
 describe('App', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [App],
-      providers: [provideZonelessChangeDetection()]
+      imports: [App, RouterOutlet, NavbarSmartComponent],
+      providers: [provideZonelessChangeDetection(), provideRouter([])]
     }).compileComponents();
   });
 

@@ -40,16 +40,16 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      # Tests
-      - name: Test
-        run: npm run test:ci
-
       # Set environment variables
       - name: Create environment file
         run: |
-          mkdir environments
+          mkdir src/environments
           echo "Creating production environment file..."
-          echo "${{ secrets.FIREBASE_ENVIRONMENT }}" >> environments/environment.ts
+          echo "${{ secrets.FIREBASE_ENVIRONMENT }}" >> src/environments/environment.ts
+
+      # Tests
+      - name: Test
+        run: npm run test
 
       # Build
       - name: Build
