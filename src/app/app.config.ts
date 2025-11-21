@@ -1,5 +1,5 @@
 import { ApplicationConfig, inject, provideAppInitializer, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
-import { provideRouter, Router } from '@angular/router';
+import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
 import { provideHttpClient } from '@angular/common/http';
@@ -19,7 +19,6 @@ export const appConfig: ApplicationConfig = {
         inject(AuthenticationService),
         inject(UserService),
         inject(UserStore),
-        inject(Router)
       )();
     }),
   ],
