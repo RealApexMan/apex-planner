@@ -1,9 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '@env/environment';
-import { map, Observable } from 'rxjs';
-import { AuthenticationService, LoginResponse, RegisterResponse } from '../port/authentication.service';
-
+import { catchError, map, Observable, of, throwError } from 'rxjs';
+import {
+  AuthenticationService,
+  LoginResponse,
+  RegisterResponse,
+} from '../port/authentication.service';
+import { EmailAlreadyTakenError } from '@app/visitor/signup/domain/email-already-taken.error';
 
 /**
  * Represents the payload of the response received when registering a new user in Firebase.
@@ -29,21 +33,27 @@ interface FirebaseResponseSignin {
 }
 
 @Injectable()
-export class AuthenticationFirebaseService implements AuthenticationService{
+export class AuthenticationFirebaseService implements AuthenticationService {
   readonly #http = inject(HttpClient);
 
-  register(email: string, password: string): Observable<RegisterResponse>{
-    console.log('register');
+  register(email: string, password: string): Observable<RegisterResponse> {
     const url = `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${environment.firebase.apiKey}`;
     const body = { email, password, returnSecureToken: true };
 
     return this.#http.post<FirebaseResponseSignup>(url, body).pipe(
       map((response) => ({
-        jwtToken: response.idToken,
-        jwtRefreshToken: response.refreshToken,
-        expiresIn: response.expiresIn,
-        userId: response.localId,
-      }))
+          jwtToken: response.idToken,
+          jwtRefreshToken: response.refreshToken,
+          expiresIn: response.expiresIn,
+          userId: response.localId,
+      })),
+      catchError(error => {
+        if(error.error.error.message === 'EMAIL_EXISTS') {
+          return of(new EmailAlreadyTakenError(email));
+        } 
+
+        return throwError(() => error);
+      })
     );
   }
 
