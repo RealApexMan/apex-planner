@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { UserStore } from '@app/core/store/user.store';
 
 @Component({
   selector: 'app-dashboard',
@@ -7,5 +8,5 @@ import { Component } from '@angular/core';
   styleUrl: './dashboard.page.component.scss',
 })
 export class DashboardPageComponent {
-
+  readonly store = inject(UserStore);
 }
