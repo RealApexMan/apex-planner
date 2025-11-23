@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { HomeBannerDumbComponent } from './home-banner.dumb.component';
-import { DebugElement } from '@angular/core';
+import { DebugElement, provideZonelessChangeDetection } from '@angular/core';
 import { By } from '@angular/platform-browser';
 
 describe('HomeBannerDumbComponent', () => {
@@ -15,6 +15,7 @@ describe('HomeBannerDumbComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [HomeBannerDumbComponent],
+      providers: [provideZonelessChangeDetection()]
     }).compileComponents();
 
     fixture = TestBed.createComponent(HomeBannerDumbComponent);
