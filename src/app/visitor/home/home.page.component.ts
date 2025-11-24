@@ -1,16 +1,16 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { HomeBannerDumbComponent } from "./home-banner/home-banner.dumb.component";
-import { HomepageFeatureCardListDumbComponent } from "./homepage-feature-card-list/homepage-feature-card-list.dumb.component";
+import { HomeBannerDumbComponent } from './home-banner/home-banner.dumb.component';
+import { HomepageFeatureCardListDumbComponent } from './homepage-feature-card-list/homepage-feature-card-list.dumb.component';
 
 @Component({
   selector: 'app-home',
   imports: [HomeBannerDumbComponent, HomepageFeatureCardListDumbComponent],
   templateUrl: './home.page.component.html',
   styleUrl: './home.page.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomePageComponent {
-featureCardList = signal([
+  featureCardList = signal([
     {
       name: 'Planifier sa semaine',
       icon: 'calendar-heart-fill',
@@ -24,11 +24,11 @@ featureCardList = signal([
     {
       name: 'Analyser sa productivité',
       icon: 'bar-chart-line-fill',
-      description: 'Visualiser le travail accomplis',
+      description: 'Visualiser le travail accompli',
     },
   ]);
 
-onBannerClicked() {
+  onBannerClicked() {
     console.log('Banner clicked');
   }
 }
