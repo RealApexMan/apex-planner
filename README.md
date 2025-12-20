@@ -3,6 +3,7 @@
 A webapp for personal productivity using pomodoro technique.
 
 ## Getting started
+
 > Run 'npm install'
 > Run 'npm start'
 
