@@ -10,7 +10,17 @@ import {
   withState,
 } from '@ngrx/signals';
 import { Subject, takeUntil, timer } from 'rxjs';
-import { MAXIMUM_POMODORO_DURATION, Task } from './task.model';
+import {
+  getActivePomodoroIndex,
+  getActiveTask,
+  getActiveTaskIndex,
+  getTaskEmojiStatus,
+  isTaskCompleted,
+  MAXIMUM_POMODORO_DURATION,
+  PomodoroList,
+  Task,
+  TaskList,
+} from './task.model';
 
 interface WorkdayState {
   workday: Workday;
@@ -47,16 +57,35 @@ export const WorkdayStore = signalStore(
         .pipe(takeUntil(pomodoroCompleted), takeUntilDestroyed(destroyRef))
         .subscribe((elapsedSeconds: number) => {
           patchState(store, { progress: elapsedSeconds });
+          patchState(store, (state) => {
+            // Update current pomodoro time immutably so signals detect the change
+            const task = getActiveTask(state.taskList);
+            const taskIndex = getActiveTaskIndex(state.taskList);
 
-          if (elapsedSeconds === Workday.MAX_POMODORO_DURATION_IN_SEC) {
-            pomodoroCompleted.next();
-            patchState(store, ({ workday }) => ({
-              workday: workday.setEditMode(),
-              progress: 0,
-            }));
+            if (!task) {
+              throw new Error('No active task found');
+            }
 
-            return;
-          }
+            const pomodoroIndex = getActivePomodoroIndex(task);
+
+            if (pomodoroIndex === -1) {
+              throw new Error('No active pomodoro found');
+            }
+
+            // Create a new pomodoro list and a new task object (immutable update)
+            const newPomodoroList = [...task.pomodoroList] as PomodoroList;
+            newPomodoroList[pomodoroIndex] = elapsedSeconds;
+
+            const updatedTask: Task = {
+              ...task,
+              pomodoroList: newPomodoroList,
+              statusEmoji: getTaskEmojiStatus({
+                ...task,
+                pomodoroList: newPomodoroList,
+              }),
+            };
+
+            const taskList: TaskList = store.taskList().toSpliced(taskIndex, 1, updatedTask);
 
           patchState(store, ({ workday }) => {
             return { workday: workday.tick() };
